@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Wszystkiego Najlepszego!</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    font-family: 'Inter', sans-serif;
+    background: #0a0a1a;
+    color: #fff;
+  }
+
+  .screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    text-align: center;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    opacity: 0;
+    transform: translateY(40px);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .screen.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: all;
+  }
+
+  .screen.exit {
+    opacity: 0;
+    transform: translateY(-40px);
+  }
+
+  /* Screen 1 - Welcome */
+  #screen1 {
+    background: linear-gradient(135deg, #1a0a2e 0%, #16213e 50%, #0a0a1a 100%);
+  }
+
+  .cake-emoji {
+    font-size: 5rem;
+    margin-bottom: 1.5rem;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+  }
+
+  .title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 8vw, 3.5rem);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #f5af19, #f12711, #f5af19);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 3s linear infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 0% center; }
+    100% { background-position: 200% center; }
+  }
+
+  .subtitle {
+    font-size: clamp(1rem, 4vw, 1.3rem);
+    font-weight: 300;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+  }
+
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .btn:hover, .btn:active {
+    transform: scale(1.05);
+    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.4);
+  }
+
+  .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 30%, rgba(255,255,255,0.2) 50%, transparent 70%);
+    background-size: 200% 100%;
+    animation: btn-shimmer 2s infinite;
+  }
+
+  @keyframes btn-shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  /* Screen 2 - Tease */
+  #screen2 {
+    background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #2d1b4e 100%);
+  }
+
+  .tease-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+  }
+
+  .tease-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 6vw, 2.5rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: #e8d5f5;
+  }
+
+  .tease-sub {
+    font-size: clamp(0.95rem, 3.5vw, 1.15rem);
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+  }
+
+  .btn-gold {
+    background: linear-gradient(135deg, #f5af19, #f12711);
+  }
+
+  .btn-gold:hover, .btn-gold:active {
+    box-shadow: 0 10px 40px rgba(245, 175, 25, 0.4);
+  }
+
+  /* Screen 3 - Countdown */
+  #screen3 {
+    background: linear-gradient(135deg, #2d1b4e 0%, #1a0a2e 50%, #0a0a1a 100%);
+  }
+
+  .countdown-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+
+  .countdown-nums {
+    display: flex;
+    gap: 1rem;
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(4rem, 15vw, 8rem);
+    font-weight: 700;
+  }
+
+  .countdown-num {
+    opacity: 0;
+    transform: scale(2);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    background: linear-gradient(135deg, #f5af19, #f12711);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .countdown-num.show {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* Screen 4 - Reveal */
+  #screen4 {
+    background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0a0a1a 100%);
+    overflow-y: auto;
+    justify-content: flex-start;
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+  }
+
+  .reveal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.5rem, 6vw, 2.5rem);
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, #f5af19, #f12711);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .reveal-sub {
+    font-size: clamp(0.9rem, 3vw, 1.1rem);
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 1.5rem;
+  }
+
+  .event-info {
+    background: rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    max-width: 360px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .event-info p {
+    margin: 0.4rem 0;
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .event-info .event-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #f5af19;
+    margin-bottom: 0.6rem;
+  }
+
+  .tickets-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    max-width: 360px;
+  }
+
+  .ticket-card {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+
+  .ticket-card.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  .ticket-card img {
+    width: 100%;
+    display: block;
+  }
+
+  .ticket-label {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .download-section {
+    width: 100%;
+    max-width: 360px;
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .btn-download {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.9rem 1.5rem;
+    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .btn-download:hover, .btn-download:active {
+    transform: scale(1.03);
+    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+  }
+
+  .heart-footer {
+    margin-top: 2rem;
+    font-size: 1rem;
+    color: rgba(255,255,255,0.5);
+  }
+
+  /* Confetti canvas */
+  #confetti {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    pointer-events: none;
+  }
+
+  /* Sparkles */
+  .sparkle {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    animation: sparkle-fade 2s ease-out forwards;
+  }
+
+  @keyframes sparkle-fade {
+    0% { opacity: 1; transform: scale(0); }
+    50% { opacity: 1; transform: scale(1); }
+    100% { opacity: 0; transform: scale(0); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Screen 1: Welcome -->
+<div class="screen active" id="screen1">
+  <div class="cake-emoji">&#127874;</div>
+  <h1 class="title">Kochana Mamo!</h1>
+  <p class="subtitle">Wszystkiego najlepszego<br>z okazji urodzin!<br><br>Mamy dla Ciebie<br>wyj&#261;tkowy prezent...</p>
+  <button class="btn" onclick="goTo(2)">Otw&#243;rz prezent &#127381;</button>
+</div>
+
+<!-- Screen 2: Tease -->
+<div class="screen" id="screen2">
+  <div class="tease-icon">&#127917;</div>
+  <h2 class="tease-text">Przygotuj si&#281;...</h2>
+  <p class="tease-sub">To b&#281;dzie wiecz&#243;r,<br>kt&#243;rego nie zapomnisz!</p>
+  <button class="btn btn-gold" onclick="goTo(3)">Poka&#380;! &#10024;</button>
+</div>
+
+<!-- Screen 3: Countdown -->
+<div class="screen" id="screen3">
+  <div class="countdown-container">
+    <div class="countdown-nums">
+      <span class="countdown-num" id="c3">3</span>
+      <span class="countdown-num" id="c2">2</span>
+      <span class="countdown-num" id="c1">1</span>
+    </div>
+  </div>
+</div>
+
+<!-- Screen 4: Reveal -->
+<div class="screen" id="screen4">
+  <div class="reveal-title">Idziemy do teatru!</div>
+  <p class="reveal-sub">Oto Twoje bilety:</p>
+
+  <div class="event-info">
+    <p class="event-name">&#127917; Dobrze si&#281; k&#322;amie</p>
+    <p>&#128197; 20 czerwca 2026, godz. 18:30</p>
+    <p>&#128205; Miejski O&#347;rodek Kultury</p>
+    <p>al. Wolno&#347;ci 23, Nowy S&#261;cz</p>
+    <p>&#128186; Parter, rz&#261;d IX, miejsca 6 i 7</p>
+  </div>
+
+  <div class="tickets-container">
+    <div class="ticket-card" id="ticket1">
+      <img src="bilet1.jpg" alt="Bilet 1">
+      <span class="ticket-label">Miejsce 6</span>
+    </div>
+    <div class="ticket-card" id="ticket2">
+      <img src="bilet2.jpg" alt="Bilet 2">
+      <span class="ticket-label">Miejsce 7</span>
+    </div>
+  </div>
+
+  <div class="download-section">
+    <a class="btn-download" href="bilet1.jpg" download="bilet1.jpg">&#128229; Pobierz bilet - miejsce 6</a>
+    <a class="btn-download" href="bilet2.jpg" download="bilet2.jpg">&#128229; Pobierz bilet - miejsce 7</a>
+  </div>
+
+  <p class="heart-footer">&#10084;&#65039; Kochamy Ci&#281;, Mamo!</p>
+</div>
+
+<canvas id="confetti"></canvas>
+
+<script>
+  let current = 1;
+
+  function goTo(n) {
+    if (n === current) return;
+
+    const from = document.getElementById('screen' + current);
+    const to = document.getElementById('screen' + n);
+
+    from.classList.remove('active');
+    from.classList.add('exit');
+
+    setTimeout(() => {
+      from.classList.remove('exit');
+    }, 600);
+
+    setTimeout(() => {
+      to.classList.add('active');
+      current = n;
+
+      if (n === 3) runCountdown();
+    }, 300);
+  }
+
+  function runCountdown() {
+    const nums = [
+      document.getElementById('c3'),
+      document.getElementById('c2'),
+      document.getElementById('c1')
+    ];
+
+    nums.forEach((el, i) => {
+      setTimeout(() => {
+        el.classList.add('show');
+      }, i * 700);
+    });
+
+    setTimeout(() => {
+      goTo(4);
+      setTimeout(() => {
+        launchConfetti();
+        revealTickets();
+      }, 400);
+    }, 2800);
+  }
+
+  function revealTickets() {
+    const t1 = document.getElementById('ticket1');
+    const t2 = document.getElementById('ticket2');
+
+    setTimeout(() => t1.classList.add('show'), 300);
+    setTimeout(() => t2.classList.add('show'), 700);
+  }
+
+  // Confetti
+  function launchConfetti() {
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const colors = ['#f5af19', '#f12711', '#667eea', '#764ba2', '#ff6b6b', '#ffd93d', '#6bcb77'];
+    const pieces = [];
+
+    for (let i = 0; i < 150; i++) {
+      pieces.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        w: Math.random() * 10 + 5,
+        h: Math.random() * 6 + 3,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vy: Math.random() * 3 + 2,
+        vx: (Math.random() - 0.5) * 2,
+        rot: Math.random() * 360,
+        vr: (Math.random() - 0.5) * 10,
+        opacity: 1
+      });
+    }
+
+    let frame = 0;
+    const maxFrames = 300;
+
+    function animate() {
+      frame++;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      pieces.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rot += p.vr;
+        p.vy += 0.05;
+
+        if (frame > maxFrames - 60) {
+          p.opacity = Math.max(0, p.opacity - 0.02);
+        }
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate((p.rot * Math.PI) / 180);
+        ctx.globalAlpha = p.opacity;
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+        ctx.restore();
+      });
+
+      if (frame < maxFrames) {
+        requestAnimationFrame(animate);
+      } else {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+
+    animate();
+  }
+
+  // Background sparkles on screen 1 & 2
+  function createSparkle() {
+    if (current > 2) return;
+    const sparkle = document.createElement('div');
+    sparkle.className = 'sparkle';
+    sparkle.style.left = Math.random() * 100 + '%';
+    sparkle.style.top = Math.random() * 100 + '%';
+    sparkle.style.background = ['#f5af19', '#f12711', '#667eea', '#764ba2'][Math.floor(Math.random() * 4)];
+    document.body.appendChild(sparkle);
+    setTimeout(() => sparkle.remove(), 2000);
+  }
+
+  setInterval(createSparkle, 300);
+
+  // Handle resize
+  window.addEventListener('resize', () => {
+    const canvas = document.getElementById('confetti');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+</script>
+
+</body>
+</html>
